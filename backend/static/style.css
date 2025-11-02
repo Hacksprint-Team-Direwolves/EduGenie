@@ -1,0 +1,117 @@
+/* ---------- Fonts & Global ---------- */
+:root{
+  --glass: rgba(17,24,39,0.66);
+  --glass-2: rgba(17,24,39,0.5);
+  --accent: #6366f1;
+  --accent-2: #818cf8;
+}
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  margin: 0;
+  background: #000;
+  color: #e6eefc;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* Orbitron */
+.font-orbitron { font-family: 'Orbitron', sans-serif; }
+
+/* ---------- Diamond Spark Background ---------- */
+#diamond-bg{
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 30%, rgba(22,28,37,0.6), rgba(2,6,12,0.9) 60%);
+  overflow: hidden;
+}
+
+/* stars texture (uses external subtle pattern) */
+.layer.stars::before{
+  content:""; position:absolute; width:3000px; height:3000px; background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+  opacity:0.24; transform: translateY(0); animation: star-drift 200s linear infinite;
+}
+@keyframes star-drift{ to{ transform: translateY(-500px);} }
+
+/* shimmer overlay */
+.layer.shimmer{
+  position:absolute; inset:0; mix-blend-mode: screen;
+  background: linear-gradient(120deg, rgba(129,140,248,0.08), rgba(236,72,153,0.06), rgba(255,255,255,0.04));
+  animation: shimmer 9s ease-in-out infinite alternate;
+}
+@keyframes shimmer{ to { transform: translateX(80px) rotate(4deg); } }
+
+/* canvas sits behind UI */
+#spark-canvas{ position:absolute; inset:0; z-index:0; }
+
+/* ---------- Glass Cards ---------- */
+.glass-card{
+  background: var(--glass);
+  backdrop-filter: blur(12px) saturate(1.05);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 8px 24px rgba(2,6,23,0.6);
+}
+.glass-card::before{
+  content:""; position:absolute; inset:0; border-radius:14px;
+  background: linear-gradient(120deg, var(--accent-2), #ec4899, var(--accent)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude; opacity:0.25; animation: glow 6s linear infinite;
+}
+@keyframes glow{ to{ transform: rotate(360deg); } }
+
+/* ---------- Buttons / Inputs ---------- */
+.btn-primary {
+  background: linear-gradient(90deg, var(--accent), #4f46e5);
+  color: white; padding: 0.6rem 1rem; border-radius: 10px; font-weight:600;
+  transition: transform .12s ease, box-shadow .12s ease;
+  border: none;
+}
+.btn-primary:hover{ transform: translateY(-3px); box-shadow: 0 14px 30px rgba(79,70,229,0.18); }
+
+.btn-outline {
+  background: transparent; color:var(--accent-2); border:1px solid rgba(129,140,248,0.16);
+  padding:0.55rem 0.9rem; border-radius:8px;
+}
+.btn-ghost { background:transparent; color: #dbeafe; border:1px dashed rgba(255,255,255,0.04); padding:0.45rem 0.8rem; border-radius:8px; }
+
+.icon-btn { background: rgba(255,255,255,0.02); border-radius:8px; padding:0.45rem; border:1px solid rgba(255,255,255,0.03); }
+
+.small-ghost { background:transparent; color:#c7d2fe; border: none; padding:0.4rem 0.6rem; border-radius:8px; }
+
+.input {
+  background: rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.06); padding:0.55rem; border-radius:8px;
+  color: #e6eefc; width:100%;
+}
+.input::placeholder { color: #9aa6d6; }
+
+/* navigation buttons */
+.nav-btn {
+  background: transparent; color: #c7d2fe; border: none; padding: 0.45rem 0.65rem; border-radius:8px; font-weight:600;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.02); color: white; transform: translateY(-2px); }
+
+/* side links */
+.side-link { text-align:left; background:transparent; color:#c7d2fe; border:none; padding:0.5rem 0.6rem; border-radius:6px; }
+
+/* tiles and panels */
+.tile { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; }
+.panel { position:relative; }
+
+/* small utilities */
+.status-row { display:flex; justify-content:space-between; align-items:center; }
+.status-title { color:#9aa6d6; font-size:0.86rem; }
+.status-value { font-weight:600; }
+
+/* modal root (dynamic) */
+.modal-backdrop {
+  position: fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; background:rgba(2,6,23,0.6);
+}
+.modal {
+  width: min(720px, 96%); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:16px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+/* responsive adjustments */
+@media (max-width:1024px){
+  .nav-btn { display:none; }
+}
