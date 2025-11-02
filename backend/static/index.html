@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Edugenie Dashboard — Universal AI Teaching Agent</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Custom -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="text-gray-100 antialiased">
+
+  <!-- Diamond Spark Background -->
+  <div id="diamond-bg" aria-hidden="true">
+    <div class="layer stars"></div>
+    <div class="layer shimmer"></div>
+    <canvas id="spark-canvas"></canvas>
+  </div>
+
+  <!-- HERO / INTRO -->
+  <header id="hero" class="relative z-30 min-h-screen flex flex-col justify-center items-center px-6 py-24">
+    <h1 class="text-5xl md:text-6xl font-orbitron font-extrabold text-white drop-shadow-2xl mb-4">Universal AI Teaching Agent</h1>
+    <p class="text-lg md:text-xl text-indigo-200 mb-6">Your personal Edugenie for every learner.</p>
+
+    <div class="flex gap-4">
+      <button id="enter-btn" class="btn-primary shadow-lg animate-pulse-light">Enter Edugenie</button>
+      <button id="open-login-hero" class="btn-ghost">Log in / Sign up</button>
+    </div>
+
+    <div class="mt-10 w-full max-w-3xl text-center text-gray-300">
+      <p class="opacity-90">Rich dashboard, course builder, quizzes, leaderboards, doubts and Ask-AI — all interactive.</p>
+    </div>
+  </header>
+
+  <!-- APP CONTAINER (hidden until login/enter) -->
+  <div id="app" class="hidden relative z-40 min-h-screen pb-24">
+
+    <!-- Top Navigation (sticky) -->
+    <nav class="sticky top-0 z-50 bg-black/40 backdrop-blur-md border-b border-gray-800">
+      <div class="container mx-auto px-4 md:px-8 flex items-center justify-between py-3">
+        <div class="flex items-center gap-4">
+          <div class="text-indigo-300 font-orbitron text-2xl">Edugenie</div>
+          <div id="nav-sections" class="hidden md:flex items-center gap-2">
+            <button class="nav-btn" data-target="main-course">Main Course</button>
+            <button class="nav-btn" data-target="leaderboard">Leaderboard</button>
+            <button class="nav-btn" data-target="quiz">Quiz</button>
+            <button class="nav-btn" data-target="doubt">Doubts</button>
+            <button class="nav-btn" data-target="dashboard">Dashboard</button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div id="user-welcome" class="text-sm text-gray-300 hidden">Welcome, <span id="user-name-short"></span></div>
+          <button id="open-profile" class="icon-btn" title="Profile">👤</button>
+          <button id="logout" class="btn-ghost hidden">Log out</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Layout -->
+    <main class="container mx-auto px-4 md:px-8 mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+      <!-- LEFT: Sidebar with steps and quick links -->
+      <aside class="lg:col-span-1 space-y-4">
+        <div class="glass-card p-4">
+          <h4 class="font-orbitron text-lg text-white mb-2">Profile & Setup</h4>
+          <div class="space-y-2">
+            <button id="btn-profile-edit" class="w-full btn-outline">Edit Profile</button>
+            <button id="btn-course-setup" class="w-full btn-outline">Course Details</button>
+            <button id="btn-launch-course" class="w-full btn-primary">Launch Course</button>
+          </div>
+        </div>
+
+        <div class="glass-card p-4">
+          <h4 class="font-orbitron text-lg text-white mb-2">Quick Links</h4>
+          <div class="grid gap-2">
+            <button class="side-link" data-target="main-course">Open Course</button>
+            <button class="side-link" data-target="quiz">Take Quiz</button>
+            <button class="side-link" data-target="leaderboard">Leaderboard</button>
+            <button class="side-link" data-target="doubt">Ask a Doubt</button>
+          </div>
+        </div>
+
+        <div class="glass-card p-4">
+          <h4 class="font-orbitron text-lg text-white mb-2">Status</h4>
+          <div id="progress-tiles" class="space-y-3">
+            <div class="status-row">
+              <div class="status-title">Trajectory</div>
+              <div id="trajectory" class="status-value text-sm text-indigo-300">Beginner</div>
+            </div>
+            <div class="status-row">
+              <div class="status-title">Course Time</div>
+              <div id="expected-time" class="status-value text-sm text-indigo-300">—</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER: Main content (switchable panels) -->
+      <section class="lg:col-span-2 space-y-6">
+
+        <!-- Dashboard (Welcome / Summary) -->
+        <div id="panel-dashboard" class="panel glass-card p-6">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="text-2xl font-orbitron">Welcome</h3>
+              <p id="welcome-sub" class="text-gray-300 mt-1">Complete profile and start building your course.</p>
+            </div>
+            <div class="text-right">
+              <div id="welcome-date" class="text-sm text-gray-400"></div>
+              <div id="welcome-action" class="mt-2">
+                <button id="start-setup" class="btn-primary">Setup Course</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tiles -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div class="tile glass-card p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm text-gray-400">Current Trajectory</div>
+                  <div id="tile-trajectory" class="text-indigo-300 font-medium">—</div>
+                </div>
+                <div class="text-xs text-gray-400">Progress</div>
+              </div>
+            </div>
+
+            <div class="tile glass-card p-4">
+              <div>
+                <div class="text-sm text-gray-400">Suggested Next</div>
+                <div id="tile-suggest" class="text-indigo-300 font-medium">Complete initial quiz</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent activity -->
+          <div class="mt-6">
+            <h4 class="text-lg font-orbitron mb-2">Recent Activity</h4>
+            <ul id="recent-list" class="text-gray-300 space-y-2">
+              <li>No activity yet. Start by setting up your course.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Main Course Panel -->
+        <div id="panel-main-course" class="panel glass-card p-6 hidden">
+
+          <div class="flex items-center justify-between">
+            <h3 class="text-2xl font-orbitron">Main Course Builder</h3>
+            <div class="flex gap-2">
+              <button id="add-lecture" class="btn-outline">+ Add Lecture</button>
+              <button id="export-course" class="btn-primary">Export</button>
+            </div>
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <!-- Left: details form -->
+            <div class="glass-card p-4">
+              <h4 class="font-medium text-gray-200 mb-2">Course Details</h4>
+
+              <div class="space-y-3">
+                <label class="block">
+                  <div class="text-sm text-gray-400">Stream</div>
+                  <input id="field-stream" class="input" placeholder="e.g., STEM, Commerce">
+                </label>
+
+                <label>
+                  <div class="text-sm text-gray-400">Class / Grade</div>
+                  <select id="field-class" class="input">
+                    <option value="">Choose class</option>
+                    <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                  </select>
+                </label>
+
+                <label>
+                  <div class="text-sm text-gray-400">Branch / School</div>
+                  <input id="field-branch" class="input" placeholder="School/Branch name">
+                </label>
+
+                <label>
+                  <div class="text-sm text-gray-400">Subject</div>
+                  <input id="field-subject" class="input" placeholder="Subject">
+                </label>
+
+                <label>
+                  <div class="text-sm text-gray-400">Topic</div>
+                  <input id="field-topic" class="input" placeholder="Topic">
+                </label>
+
+                <label>
+                  <div class="text-sm text-gray-400">Sub-topic</div>
+                  <input id="field-subtopic" class="input" placeholder="Sub-topic">
+                </label>
+
+                <label>
+                  <div class="text-sm text-gray-400">Lecture No.</div>
+                  <input id="field-lecture" type="number" min="1" class="input" placeholder="1">
+                </label>
+
+                <div class="flex gap-2 mt-2">
+                  <button id="save-course-details" class="btn-primary">Save Details</button>
+                  <button id="reset-course-details" class="btn-ghost">Reset</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: media + course meta -->
+            <div class="glass-card p-4">
+              <h4 class="font-medium text-gray-200 mb-2">Media & Course Metadata</h4>
+
+              <div class="space-y-3">
+                <label>
+                  <div class="text-sm text-gray-400">Objectives</div>
+                  <textarea id="field-objectives" class="input h-24" placeholder="What will learners achieve?"></textarea>
+                </label>
+
+                <label>
+                  <div class="text-sm text-gray-400">Expected Duration (hrs)</div>
+                  <input id="field-duration" type="text" class="input" placeholder="e.g., 10">
+                </label>
+
+                <label>
+                  <div class="text-sm text-gray-400">Suggested Learning Path</div>
+                  <input id="field-path" class="input" placeholder="E.g., Pre-quiz → Lessons → Assessment">
+                </label>
+
+                <label>
+                  <div class="text-sm text-gray-400">Add Resource (image / audio / video)</div>
+                  <input id="field-resource" type="file" class="w-full text-sm text-gray-200" />
+                </label>
+
+                <div class="text-right">
+                  <button id="attach-resource" class="btn-outline">Attach</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Course timeline / history -->
+          <div class="mt-6">
+            <h4 class="font-orbitron text-lg">Course Content</h4>
+            <div id="lectures-list" class="mt-3 space-y-3">
+              <!-- dynamic lectures -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz Panel -->
+        <div id="panel-quiz" class="panel glass-card p-6 hidden">
+          <div class="flex items-center justify-between">
+            <h3 class="text-2xl font-orbitron">Quizzes</h3>
+            <div class="flex gap-2">
+              <button id="create-quiz" class="btn-outline">Create Quiz</button>
+              <button id="take-quiz" class="btn-primary">Take Sample Quiz</button>
+            </div>
+          </div>
+
+          <div id="quiz-area" class="mt-6">
+            <p class="text-gray-400">No active quiz. Create one or take sample.</p>
+          </div>
+        </div>
+
+        <!-- Doubt Panel -->
+        <div id="panel-doubt" class="panel glass-card p-6 hidden">
+          <div class="flex items-center justify-between">
+            <h3 class="text-2xl font-orbitron">Doubts</h3>
+            <div>
+              <button id="post-doubt" class="btn-primary">Post Doubt</button>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <h4 class="text-base text-gray-300">Ask the community or the instructor</h4>
+            <textarea id="doubt-text" class="input h-24 mt-2" placeholder="Describe your doubt..."></textarea>
+            <div id="doubt-list" class="mt-4 space-y-3 text-gray-200">
+              <div class="p-3 glass-card">No doubts yet.</div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT: secondary panels (profile, AskAI, Contact) -->
+      <aside class="lg:col-span-1 space-y-4">
+
+        <div class="glass-card p-4">
+          <h4 class="font-orbitron text-lg text-white mb-2">Profile</h4>
+          <div class="text-sm text-gray-300 space-y-2">
+            <div><strong id="profile-name">—</strong></div>
+            <div id="profile-email" class="text-xs text-gray-400">—</div>
+            <div id="profile-phone" class="text-xs text-gray-400">—</div>
+          </div>
+          <div class="mt-3">
+            <button id="edit-profile" class="btn-outline w-full">Edit</button>
+          </div>
+        </div>
+
+        <div class="glass-card p-4">
+          <h4 class="font-orbitron text-lg text-white mb-2">Ask AI</h4>
+          <textarea id="ask-ai-text" class="input h-24" placeholder="Ask AI anything..."></textarea>
+          <div class="flex gap-2 mt-2">
+            <button id="ask-ai-send" class="btn-primary flex-1">Ask</button>
+            <button id="ask-ai-clear" class="btn-ghost">Clear</button>
+          </div>
+          <div id="ask-ai-result" class="mt-3 text-gray-300"></div>
+        </div>
+
+        <div class="glass-card p-4">
+          <h4 class="font-orbitron text-lg text-white mb-2">Contact & Help</h4>
+          <div class="flex flex-col gap-2">
+            <button id="open-help" class="side-link">Help</button>
+            <button id="open-contact" class="side-link">Contact Us</button>
+          </div>
+        </div>
+
+      </aside>
+
+    </main>
+
+    <!-- Footer quick-links always visible -->
+    <footer class="fixed left-0 right-0 bottom-4 z-50 flex justify-center">
+      <div class="glass-card p-3 flex items-center gap-3">
+        <button class="small-ghost" id="quick-help">Help</button>
+        <button class="small-ghost" id="quick-contact">Contact</button>
+        <button class="small-ghost" id="quick-ask">Ask AI</button>
+        <div class="ml-4 text-sm text-gray-300">All interactive. No static buttons.</div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- LOGIN / PROFILE MODALS -->
+  <div id="modal-root"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
